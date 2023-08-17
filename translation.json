@@ -1,0 +1,40 @@
+{
+	"en": {
+		"search": "Search!",
+		"enter_something": "Enter something...",
+		"favorites": "[blink]*[/]Favorites[blink]*[/]",
+		"apply": "Apply",
+		"cancel": "Cancel",
+		"db_path": "Path to SQLite DB....",
+		"close": "Close",
+		"change": "Change Language (Requires Restart)",
+		"back": "Back",
+		"go": "Let's Go!~",
+		"watch": "Watch!",
+		"next": "Next",
+		"not_found": "Not found",		
+		"add": "Add to Favorites",
+		"remove": "Remove from Favorites",
+		"no_result": "Nothing to see here..."
+
+	},
+
+	"ua": {
+		"search": "Шукати!",
+		"enter_something": "Напишіть щось...",
+		"favorites": "[blink]*[/]Улюблене[blink]*[/]",
+		"apply": "Прийняти",
+		"cancel": "Відмінити",
+		"db_path": "Шлях до SQLite БД...",
+		"close": "Закрити",
+		"change": "Змінити мову (Потребує перезапуск)",
+		"back": "Назад",
+		"go": "Вперед!",
+		"watch": "Дивитися!",
+		"next": "Далі",
+		"not_found": "Не знайдено",
+		"add": "Додати до Улюблених",
+		"remove": "Видалити з Улюблених",
+		"no_result": "Тут нічого немає..."
+	}
+}

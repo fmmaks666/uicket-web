@@ -1,0 +1,5 @@
+HdRezkaApi
+Textual
+whoosh
+requests
+BeautifulSoup4

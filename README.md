@@ -1,5 +1,5 @@
 ### Uicket
-Uicket is simple app to watch movies. Couldn't be possible if not (this)[https://github.com/SuperZombi/HdRezkaApi] API
+Uicket is simple app to watch movies. Couldn't be possible if not [this](https://github.com/SuperZombi/HdRezkaApi) API
 ##### Warning!
 Low Quality Code!
 #### Installing && Setup

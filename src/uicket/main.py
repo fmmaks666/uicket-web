@@ -2,12 +2,11 @@
 from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Button, Input, RadioButton, Label, RadioSet, Static, Select
-from textual.containers import Horizontal, Vertical, Grid, VerticalScroll
+from textual.containers import Horizontal, VerticalScroll
 from textual.screen import Screen, ModalScreen
 import sqlite3 as sql
 from json import load, dump
 from translate import Translation
-from dataclasses import dataclass
 from pathlib import Path
 from os import environ, path, makedirs
 from platform import platform
@@ -23,13 +22,14 @@ from whoosh.qparser import QueryParser, OrGroup
 
 PATH = path.dirname(__file__)
 
+
 class UserSettings:
-	def __init__(self):
-		with open(path.join(PATH, "config.json"), encoding="UTF-8") as out:
-			data = load(out)
-			self.language: str = data["language"]
-			self.db: str = data["db"]
-			self.favorites: list[int] = data["favorites"]
+    def __init__(self):
+        with open(path.join(PATH, "config.json"), encoding="UTF-8") as out:
+            data = load(out)
+            self.language: str = data["language"]
+            self.db: str | None = data["db"]
+            self.favorites: list[int] = data["favorites"]
 		
 		self.open_link = self._default_open
 		if "Linux" in platform():

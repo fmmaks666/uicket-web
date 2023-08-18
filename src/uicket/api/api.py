@@ -1,5 +1,12 @@
 import sqlite3 as sql
-from flask import Blueprint, make_response, jsonify, g, Flask  # I should remove "Flask"
+from flask import (
+    Blueprint,
+    make_response,
+    jsonify,
+    g,
+    request,
+    Flask,
+)  # I should remove "Flask"
 from json import load, dump
 
 # from tools.translate import Translation
@@ -286,16 +293,39 @@ def get_translations(id):
         code = 404
     else:
         result = result[0]
-       	release = HdRezkaApi(result[2])
-       	translations = release.getTranslations()
+        release = HdRezkaApi(result[2])
+        translations = release.getTranslations()
         body = {
             "id": result[0],
             "name": result[1],
             "link": result[2],
-            "translations": translations
+            "translations": translations,
         }
     response = make_response(jsonify(body))
-    response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    response.status_code = code
+    return response
+
+
+@api.route("/episodes/<int:id>")
+def get_episodes(id):
+    result = get_db().get_one(id)
+    if not result:
+        body = {"error": "Not found"}
+        code = 404
+    else:
+        result = result[0]
+        release = HdRezkaApi(result[2])
+        translation = request.args.get("translation", type=str)
+        if release.type == "video.movie":
+            streams = release.getStream(translation=translation).videos
+            body = {"type": "streams", "streams": streams}
+        else:
+            seasons = release.getSeasons() 
+            body = {"type": release.type, "seasons": seasons}
+        code = 200
+    response = make_response(body)
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
     response.status_code = code
     return response
 

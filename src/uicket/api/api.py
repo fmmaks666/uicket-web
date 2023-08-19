@@ -284,6 +284,13 @@ def favorite():
     )
 
 
+def generate_response(body, code):
+	response = make_response(jsonify(body))
+	response.headers["Content-Type"] = "application/json; charset=utf-8"
+	response.status_code = code
+	return response
+
+
 @api.route("/<int:id>", methods=["GET"])
 def get_translations(id):
     result = get_db().get_one(id)
@@ -301,11 +308,8 @@ def get_translations(id):
             "link": result[2],
             "translations": translations,
         }
-    response = make_response(jsonify(body))
-    response.headers["Content-Type"] = "application/json; charset=utf-8"
-    response.status_code = code
-    return response
 
+    return generate_response(body, code)
 
 @api.route("/episodes/<int:id>")
 def get_episodes(id):
@@ -324,11 +328,34 @@ def get_episodes(id):
             seasons = release.getSeasons() 
             body = {"type": release.type, "seasons": seasons}
         code = 200
-    response = make_response(body)
-    response.headers["Content-Type"] = "application/json; charset=utf-8"
-    response.status_code = code
-    return response
+    return generate_response(body, code)
 
+
+@api.route("/streams/<int:id>")
+def get_streams(id):
+	result = get_db().get_one(id)
+	if not result:
+		body = {"error": "Not found"}
+		code = 404
+		return generate_response(body, code)
+	else:
+		# I need to use & when using many args, nit ,s
+		season = request.args.get("season", type=int)
+		episode = request.args.get("episode", type=int)
+		translation = request.args.get("translation", type=str)
+		if not (season is not None and episode is not None):
+			return generate_response({"error": "Too few arguments, Required args: season: int, episode: int"}, 400)
+		result = result[0]
+		release = HdRezkaApi(result[2])
+		try:
+			streams = release.getStream(season, episode, translation=translation)
+			body = {"type": "streams", "streams": streams.videos}
+		except TypeError:
+			return generate_response({"error": "Season/Episode not found"}, 400)
+		except ValueError:
+			return generate_response({"error": f"Translation with ID {translation} doesn't exists'"}, 400)
+		return generate_response(body, 200)
+		
 
 if __name__ == "__main__":
     api.run(debug=True)

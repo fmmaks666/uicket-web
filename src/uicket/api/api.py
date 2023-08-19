@@ -5,9 +5,8 @@ from flask import (
     jsonify,
     g,
     request,
-    Flask,
-)  # I should remove "Flask"
-from json import load, dump
+)
+from json import load, dump, loads, dumps
 
 # from tools.translate import Translation
 from pathlib import Path
@@ -17,9 +16,6 @@ from shutil import rmtree
 from whoosh.index import create_in, open_dir, exists_in
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.qparser import QueryParser, OrGroup
-
-# # to access ids, . for classes
-# > for screen's widget (CSS)
 
 PATH = path.dirname(__file__)
 
@@ -70,69 +66,6 @@ class Database:
         return data
 
 
-# class SeasonPopup():
-
-# def __init__(self, seasons: dict, release: HdRezkaApi):
-# self.seasons = seasons
-# self.release = release
-# self.season_ids = tuple(self.seasons["seasons"].keys())
-# super().__init__()
-
-
-# def compose(self):
-# with RadioSet(id="season"):
-# for k in self.seasons["seasons"].values():
-# yield RadioButton(k, value=True)
-
-# # Can I get that #season in this part of code?
-# episodes = tuple((v, k) for k, v in self.seasons["episodes"][self.season_ids[0]].items())
-# yield Select(episodes, id="episode", value=tuple(self.seasons["episodes"][self.season_ids[0]].keys())[0], allow_blank=False)
-# yield Button(self.app.s("next"), id="next")
-# yield Button(self.app.s("back"), id="back")
-
-
-# def update_episodes(self):
-# select = self.query_one("#episode")
-# episodes = tuple((v, k) for k, v in self.seasons["episodes"][self.season_ids[event.radio_set.pressed_index]].items())
-# select.set_options(episodes)
-
-
-# @on(Button.Pressed, "#next")
-# def select_quality(self):
-# season = int(self.season_ids[self.query_one("#season").pressed_index])
-# episode = int(self.query_one("#episode").value)
-# translator_id = self.seasons["translator_id"]
-# streams = self.release.getStream(season, episode, translation=translator_id)
-# self.app.push_screen(QualityPopup(streams))
-
-
-# class QualityPopup(ModalScreen):
-
-# def __init__(self, streams: HdRezkaStream):
-# self.streams = streams.videos
-# super().__init__()
-
-
-# def compose(self) -> ComposeResult:
-# with RadioSet(id="quality"):
-# for k, v in self.streams.items():
-# yield RadioButton(k, value=v)
-
-# yield Button(self.app.s("go"), id="open_stream")
-# yield Button(self.app.s("back"), id="back")
-
-
-# @on(Button.Pressed, "#open_stream")
-# def go(self):
-# quality = self.query_one("#quality").pressed_index
-# stream_link = tuple(self.streams.values())[quality]
-# self.app.user_config.open_link(stream_link)
-
-# @on(Button.Pressed, "#back")
-# def back(self):
-# self.app.pop_screen()
-
-
 class Search:
     def __init__(self):
         self.schema = Schema(
@@ -142,8 +75,8 @@ class Search:
         )
         self.index = None
         self.path = path.join(PATH, "index")
-        self.path = "/data/data/com.termux/files/home/uicket-web/src/uicket/data/index" # Hard coding sucks!~
-        
+        self.path = "/data/data/com.termux/files/home/uicket-web/src/uicket/data/index"  # Hard coding sucks!~
+
     def search(self, query) -> list[tuple[int, str, str], ...] | None:
         if self.index is None:
             return
@@ -154,10 +87,7 @@ class Search:
             results = []
             for i in output:
                 results.append(((int(i["id"])), i["name"], i["url"]))
-	
-          #  if not results:
-          #      results = None
-            
+
             return results
 
     def load(self):
@@ -178,129 +108,31 @@ class Search:
             for release_id, name, url in data:
                 writer.add_document(id=str(release_id), name=name, url=url)
 
-    # def search(self):
-    # query = self.query_one("#query").value
-    # results = self.search.search(query)
-    # self.push_screen(ReleasesList(results))
-
-    # def dev_search(self):
-    # query = self.query_one("#query").value
-    # script = f"SELECT * FROM releases WHERE name LIKE '%{query}%'"
-    # results = self.db._cursor.execute(script).fetchall()
-    # self.push_screen(ReleasesList(results))
-
-    def is_favorite(self, release_id: int) -> bool:
-        if release_id in self.user_config.favorites:
-            return True
-
-        return False
-
-    def toggle_favorite(self, release_id: int) -> bool:
-        """
-        Returns True when added to favorites, False whem Removed
-        """
-        if not release_id in self.user_config.favorites:
-            self.user_config.add_favorite(release_id)
-            return True
-        else:
-            self.user_config.remove_favorite(release_id)
-            return False
-
-
-def get_db():
-    if "db" not in g:
-        db = Database()
-        db.create_connection("../data/test.db")
-        g.db = db
-    return g.db
-
 
 api = Blueprint("api", __name__)
-api = Flask(__name__)
-db = Database()
-db.create_connection("../data/test.db")
-
-
-def validate(url):
-    if url.startswith("https://rezka.ag") and url.endswith(".html"):
-        return True
-    else:
-        return False
-
-
-def favorite():
-    self.app.toggle_favorite(self.release_id)
-    event.button.label = (
-        self.app.s("remove")
-        if self.app.is_favorite(self.release_id)
-        else self.app.s("add")
-    )
-
-
-@api.route("/<int:id>", methods=["GET"])
-def get_translations(id):
-    result = get_db().get_one(id)
-    code = 200
-    if not result:
-        result = None
-        code = 404
-        return False
-
-    def toggle_favorite(self, release_id: int) -> bool:
-        """
-        Returns True when added to favorites, False whem Removed
-        """
-        if not release_id in self.user_config.favorites:
-            self.user_config.add_favorite(release_id)
-            return True
-        else:
-            self.user_config.remove_favorite(release_id)
-            return False
 
 
 def get_db():
     if "db" not in g:
         db = Database()
-        db.create_connection("../data/test.db")
+        db.create_connection("data/test.db")
         g.db = db
     return g.db
 
 
 def get_search():
-	if "search" not in g:
-		search = Search()
-		search.load()
-		g.search = search
-	return g.search
-
-
-api = Blueprint("api", __name__)
-api = Flask(__name__)
-db = Database()
-db.create_connection("../data/test.db")
-
-
-def validate(url):
-    if url.startswith("https://rezka.ag") and url.endswith(".html"):
-        return True
-    else:
-        return False
-
-
-def favorite():
-    self.app.toggle_favorite(self.release_id)
-    event.button.label = (
-        self.app.s("remove")
-        if self.app.is_favorite(self.release_id)
-        else self.app.s("add")
-    )
+    if "search" not in g:
+        search = Search()
+        search.load()
+        g.search = search
+    return g.search
 
 
 def generate_response(body, code):
-	response = make_response(jsonify(body))
-	response.headers["Content-Type"] = "application/json; charset=utf-8"
-	response.status_code = code
-	return response
+    response = make_response(jsonify(body))
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    response.status_code = code
+    return response
 
 
 @api.route("/<int:id>", methods=["GET"])
@@ -323,6 +155,7 @@ def get_translations(id):
 
     return generate_response(body, code)
 
+
 @api.route("/episodes/<int:id>", methods=["GET"])
 def get_episodes(id):
     result = get_db().get_one(id)
@@ -337,7 +170,7 @@ def get_episodes(id):
             streams = release.getStream(translation=translation).videos
             body = {"type": "streams", "streams": streams}
         else:
-            seasons = release.getSeasons() 
+            seasons = release.getSeasons()
             body = {"type": release.type, "seasons": seasons}
         code = 200
     return generate_response(body, code)
@@ -345,43 +178,81 @@ def get_episodes(id):
 
 @api.route("/streams/<int:id>", methods=["GET"])
 def get_streams(id):
-	result = get_db().get_one(id)
-	if not result:
-		body = {"error": "Not found"}
-		code = 404
-		return generate_response(body, code)
-	else:
-		# I need to use & when using many args, nit ,s
-		season = request.args.get("season", type=int)
-		episode = request.args.get("episode", type=int)
-		translation = request.args.get("translation", type=str)
-		if not (season is not None and episode is not None):
-			return generate_response({"error": "Too few arguments, Required args: season: int, episode: int"}, 400)
-		result = result[0]
-		release = HdRezkaApi(result[2])
-		try:
-			streams = release.getStream(season, episode, translation=translation)
-			body = {"type": "streams", "streams": streams.videos}
-		except TypeError:
-			return generate_response({"error": "Season/Episode not found"}, 400)
-		except ValueError:
-			return generate_response({"error": f"Translation with ID {translation} doesn't exists'"}, 400)
-		return generate_response(body, 200)
+    result = get_db().get_one(id)
+    if not result:
+        body = {"error": "Not found"}
+        code = 404
+        return generate_response(body, code)
+    else:
+        # I need to use & when using many args, not ,s
+        season = request.args.get("season", type=int)
+        episode = request.args.get("episode", type=int)
+        translation = request.args.get("translation", type=str)
+        if not (season is not None and episode is not None):
+            return generate_response(
+                {
+                    "error": "Too few arguments, Required args: season: int, episode: int"
+                },
+                400,
+            )
+        result = result[0]
+        release = HdRezkaApi(result[2])
+        try:
+            streams = release.getStream(season, episode, translation=translation)
+            body = {"type": "streams", "streams": streams.videos}
+        except TypeError:
+            return generate_response({"error": "Season/Episode not found"}, 400)
+        except ValueError:
+            return generate_response(
+                {"error": f"Translation with ID {translation} doesn't exists'"}, 400
+            )
+        return generate_response(body, 200)
 
 
-@api.route("/search", methods=["GET"])		
+@api.route("/search", methods=["GET"])
 def search_releases():
-	query = request.args.get("q", type=str)
-	if query is None:
-		return generate_response({"error": "Too few arguments, Required args: q: str"}, 400)
-	results = get_search().search(query)
-	code = 200
-	body = {"type": "releases", "results": results}
-	if not results:
-		code = 204 # 204 == No content
-		body = None
-	return generate_response(body, code)
-		
+    query = request.args.get("q", type=str)
+    if query is None:
+        return generate_response(
+            {"error": "Too few arguments, Required args: q: str"}, 400
+        )
+    results = get_search().search(query)
+    code = 200
+    body = {"type": "releases", "results": results}
+    if not results:
+        code = 204  # 204 == No content
+        body = None
+    return generate_response(body, code)
 
-if __name__ == "__main__":
-    api.run(debug=True)
+
+@api.route("/favorites", methods=["GET"])
+def get_favorites():
+    favorites = request.cookies.get("Favorites")
+    if favorites is None:
+        return generate_response({"error": "Favorites aren't created"}, 404)
+    response = generate_response({"favorites": loads(favorites)}, 200)
+    return response
+
+
+@api.route("/favorites/<int:id>", methods=["POST"])
+def add_favorite(id):
+    favorites = request.cookies.get("Favorites")
+    if favorites is None:
+        return generate_response({"error": "Favorites aren't created"}, 404)
+    favorites = set(loads(favorites))
+    favorites.add(id)
+    response = generate_response({"success": True}, 200)
+    response.set_cookie("Favorites", dumps(list(favorites)))
+    return response
+
+
+@api.route("/favorites/<int:id>", methods=["DELETE"])
+def remove_favorite(id):
+    favorites = request.cookies.get("Favorites")
+    if favorites is None:
+        return generate_response({"error": "Favorites aren't created"}, 404)
+    favorites = set(loads(favorites))
+    favorites.discard(id)
+    response = generate_response({"success": True}, 200)
+    response.set_cookie("Favorites", dumps(list(favorites)))
+    return response

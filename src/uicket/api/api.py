@@ -142,8 +142,9 @@ class Search:
         )
         self.index = None
         self.path = path.join(PATH, "index")
-
-    def search(self, query) -> list[tuple[int, str, str], ...]:
+        self.path = "/data/data/com.termux/files/home/uicket-web/src/uicket/data/index" # Hard coding sucks!~
+        
+    def search(self, query) -> list[tuple[int, str, str], ...] | None:
         if self.index is None:
             return
         with self.index.searcher() as searcher:
@@ -153,7 +154,10 @@ class Search:
             results = []
             for i in output:
                 results.append(((int(i["id"])), i["name"], i["url"]))
-
+	
+          #  if not results:
+          #      results = None
+            
             return results
 
     def load(self):
@@ -262,6 +266,14 @@ def get_db():
     return g.db
 
 
+def get_search():
+	if "search" not in g:
+		search = Search()
+		search.load()
+		g.search = search
+	return g.search
+
+
 api = Blueprint("api", __name__)
 api = Flask(__name__)
 db = Database()
@@ -311,7 +323,7 @@ def get_translations(id):
 
     return generate_response(body, code)
 
-@api.route("/episodes/<int:id>")
+@api.route("/episodes/<int:id>", methods=["GET"])
 def get_episodes(id):
     result = get_db().get_one(id)
     if not result:
@@ -331,7 +343,7 @@ def get_episodes(id):
     return generate_response(body, code)
 
 
-@api.route("/streams/<int:id>")
+@api.route("/streams/<int:id>", methods=["GET"])
 def get_streams(id):
 	result = get_db().get_one(id)
 	if not result:
@@ -355,6 +367,20 @@ def get_streams(id):
 		except ValueError:
 			return generate_response({"error": f"Translation with ID {translation} doesn't exists'"}, 400)
 		return generate_response(body, 200)
+
+
+@api.route("/search", methods=["GET"])		
+def search_releases():
+	query = request.args.get("q", type=str)
+	if query is None:
+		return generate_response({"error": "Too few arguments, Required args: q: str"}, 400)
+	results = get_search().search(query)
+	code = 200
+	body = {"type": "releases", "results": results}
+	if not results:
+		code = 204 # 204 == No content
+		body = None
+	return generate_response(body, code)
 		
 
 if __name__ == "__main__":

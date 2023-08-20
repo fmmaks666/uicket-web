@@ -7,7 +7,7 @@ from flask import (
     request,
 )
 from json import load, dump, loads, dumps
-
+from .tools import Search, Database
 # from tools.translate import Translation
 from pathlib import Path
 from os import environ, path, makedirs
@@ -17,96 +17,96 @@ from whoosh.index import create_in, open_dir, exists_in
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.qparser import QueryParser, OrGroup
 
-PATH = path.dirname(__file__)
+PATH = path.dirname(__file__) # This sucks too
+__version__ = "Unstable/Development"
+
+# class Database:
+    # def __init__(self):
+        # self._db = None
+        # self._cursor = None
+        # self.get_many_query = """SELECT * FROM releases WHERE id IN({})"""  # {} for formaatting. Should be formatted to ?, ?,...
+
+    # def create_connection(self, path: str) -> None:
+        # self._db = sql.connect(path)
+        # self._cursor = self._db.cursor()
+        # self._cursor.execute(
+            # "CREATE TABLE IF NOT EXISTS releases(id INTEGER PRIMARY KEY, name TEXT, url TEXT)"
+        # )
+
+    # def close(self):
+        # if self._db is not None:
+            # self._db.close()
+
+    # def get_one(self, release_id: int) -> tuple[tuple[int, str, str], ...] | None:
+        # if self._cursor is None:
+            # return
+        # return self._cursor.execute(
+            # "SELECT * FROM releases WHERE id=?", (str(release_id),)
+        # ).fetchall()
+
+    # def get_many(
+        # self, values: tuple[int] | list[int]
+    # ) -> tuple[tuple[int, str, str], ...]:
+        # if self._cursor is None:
+            # return
+        # amount = ", ".join(["?"] * len(values))
+        # return self._cursor.execute(
+            # self.get_many_query.format(amount), values
+        # ).fetchall()
+
+    # def get_all(self, no_fetch=False):
+        # if self._cursor is None:
+            # return None
+
+        # data = self._cursor.execute("SELECT * FROM releases")
+
+        # if not no_fetch:
+            # data.fetchall()
+
+        # return data
 
 
-class Database:
-    def __init__(self):
-        self._db = None
-        self._cursor = None
-        self.get_many_query = """SELECT * FROM releases WHERE id IN({})"""  # {} for formaatting. Should be formatted to ?, ?,...
+# class Search:
+    # def __init__(self):
+        # self.schema = Schema(
+            # id=ID(stored=True, unique=True),
+            # name=TEXT(stored=True),
+            # url=TEXT(stored=True),
+        # )
+        # self.index = None
+        # self.path = path.join(PATH, "index")
+        # self.path = "/data/data/com.termux/files/home/uicket-web/src/uicket/data/index"  # Hard coding sucks!~
 
-    def create_connection(self, path: str) -> None:
-        self._db = sql.connect(path)
-        self._cursor = self._db.cursor()
-        self._cursor.execute(
-            "CREATE TABLE IF NOT EXISTS releases(id INTEGER PRIMARY KEY, name TEXT, url TEXT)"
-        )
+    # def search(self, query) -> list[tuple[int, str, str], ...] | None:
+        # if self.index is None:
+            # return
+        # with self.index.searcher() as searcher:
+            # parser = QueryParser("name", self.index.schema, group=OrGroup)
+            # parsed = parser.parse(query)
+            # output = searcher.search(parsed)
+            # results = []
+            # for i in output:
+                # results.append(((int(i["id"])), i["name"], i["url"]))
 
-    def close(self):
-        if self._db is not None:
-            self._db.close()
+            # return results
 
-    def get_one(self, release_id: int) -> tuple[tuple[int, str, str], ...] | None:
-        if self._cursor is None:
-            return
-        return self._cursor.execute(
-            "SELECT * FROM releases WHERE id=?", (str(release_id),)
-        ).fetchall()
+    # def load(self):
+        # if exists_in(self.path) and self.index is None:
+            # self.index = open_dir(self.path)
 
-    def get_many(
-        self, values: tuple[int] | list[int]
-    ) -> tuple[tuple[int, str, str], ...]:
-        if self._cursor is None:
-            return
-        amount = ", ".join(["?"] * len(values))
-        return self._cursor.execute(
-            self.get_many_query.format(amount), values
-        ).fetchall()
+    # def create(self, db: Database):
+        # if Path(self.path).exists():
+            # rmtree(self.path, ignore_errors=True)
 
-    def get_all(self, no_fetch=False):
-        if self._cursor is None:
-            return None
+        # makedirs(self.path)
+        # self.index = create_in(self.path, self.schema)
+        # data = db.get_all(True)
+        # if data is None:
+            # return
 
-        data = self._cursor.execute("SELECT * FROM releases")
-
-        if not no_fetch:
-            data.fetchall()
-
-        return data
-
-
-class Search:
-    def __init__(self):
-        self.schema = Schema(
-            id=ID(stored=True, unique=True),
-            name=TEXT(stored=True),
-            url=TEXT(stored=True),
-        )
-        self.index = None
-        self.path = path.join(PATH, "index")
-        self.path = "/data/data/com.termux/files/home/uicket-web/src/uicket/data/index"  # Hard coding sucks!~
-
-    def search(self, query) -> list[tuple[int, str, str], ...] | None:
-        if self.index is None:
-            return
-        with self.index.searcher() as searcher:
-            parser = QueryParser("name", self.index.schema, group=OrGroup)
-            parsed = parser.parse(query)
-            output = searcher.search(parsed)
-            results = []
-            for i in output:
-                results.append(((int(i["id"])), i["name"], i["url"]))
-
-            return results
-
-    def load(self):
-        if exists_in(self.path) and self.index is None:
-            self.index = open_dir(self.path)
-
-    def create(self, db: Database):
-        if Path(self.path).exists():
-            rmtree(self.path, ignore_errors=True)
-
-        makedirs(self.path)
-        self.index = create_in(self.path, self.schema)
-        data = db.get_all(True)
-        if data is None:
-            return
-
-        with self.index.writer() as writer:
-            for release_id, name, url in data:
-                writer.add_document(id=str(release_id), name=name, url=url)
+        # with self.index.writer() as writer:
+            # for release_id, name, url in data:
+                # writer.add_document(id=str(release_id), name=name, url=url)
 
 
 api = Blueprint("api", __name__)
@@ -146,10 +146,14 @@ def get_translations(id):
         result = result[0]
         release = HdRezkaApi(result[2])
         translations = release.getTranslations()
+        if None in translations:
+            value = translations.pop(None)
+            translations[value] = value
         body = {
             "id": result[0],
             "name": result[1],
             "link": result[2],
+            "type": release.type,
             "translations": translations,
         }
 
@@ -256,3 +260,8 @@ def remove_favorite(id):
     response = generate_response({"success": True}, 200)
     response.set_cookie("Favorites", dumps(list(favorites)))
     return response
+
+
+@api.route("/version", methods=["GET"])
+def version():
+	return generate_response({"version": __version__, "text": "Uicket Web API/Development"}, 200)

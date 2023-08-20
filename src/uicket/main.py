@@ -1,5 +1,5 @@
 from flask import Flask, request, make_response, render_template
-from api import api
+from uicket.api import api
 from json import dumps
 
 app = Flask(__name__)

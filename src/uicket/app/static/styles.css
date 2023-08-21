@@ -1,0 +1,13 @@
+/* your_styles.css */
+.card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column; /* Display children in a column */
+    align-items: left; /* Center children horizontally */
+}
+
+.card button {
+    margin-top: 10px; /* Add spacing between label and button */
+}

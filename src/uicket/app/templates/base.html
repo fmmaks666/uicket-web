@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{% block title %}Uicket Web{% endblock %}</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+	</head>
+	<body>
+		<header> <a href="/"> <img src="{{ url_for('static', filename='logo.png')}}" alt="Uicket Web" width=150 height=100> </a> </header>
+		{% block content %}
+		{% endblock %}
+	</body>
+</html>

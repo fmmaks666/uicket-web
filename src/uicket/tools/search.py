@@ -7,7 +7,7 @@ from whoosh.fields import Schema, TEXT, ID
 from whoosh.qparser import QueryParser, OrGroup
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-	from tools.database import Database
+	from .database import Database
 PATH = path.dirname(__file__)
 
 

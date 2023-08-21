@@ -7,7 +7,7 @@ from flask import (
     request,
 )
 from json import load, dump, loads, dumps
-from .tools import Search, Database
+from uicket.tools import Search, Database
 # from tools.translate import Translation
 from pathlib import Path
 from os import environ, path, makedirs
@@ -19,7 +19,6 @@ from whoosh.qparser import QueryParser, OrGroup
 
 PATH = path.dirname(__file__) # This sucks too
 __version__ = "Unstable/Development"
-
 # class Database:
     # def __init__(self):
         # self._db = None
@@ -115,7 +114,7 @@ api = Blueprint("api", __name__)
 def get_db():
     if "db" not in g:
         db = Database()
-        db.create_connection("data/test.db")
+        db.create_connection()
         g.db = db
     return g.db
 

@@ -1,4 +1,8 @@
 import sqlite3 as sql
+from os import path
+
+PATH = path.dirname(__file__)
+DB_NAME = "test.db"
 
 
 class Database:
@@ -10,7 +14,7 @@ class Database:
         self.get_many_query = """SELECT * FROM releases WHERE id IN({})"""  # {} for formatting. Should be formatted to ?, ?,...
 
 
-    def create_connection(self, path: str) -> None:
+    def create_connection(self, path: str = path.join(PATH, "data", DB_NAME)) -> None:
         self._db = sql.connect(path)
         self._cursor = self._db.cursor()
         self._cursor.execute(

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "uicket"
+authors = [{name = "fmmaks", email = "fmmaks666@tuta.io"}]
+requires-python = "~=3.11"
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)", "Private :: Do Not Upload"]
+dynamic = ["version", "description"]
+urls = {Home = "https://github.com/fmmaks666/uicket-web"}
+
+dependencies = [
+	"Flask~=2.3.2",
+	"BeautifulSoup4~=4.12.2",
+	"HdRezkaApi~=5.2",
+	"whoosh~=2.7.4"
+]

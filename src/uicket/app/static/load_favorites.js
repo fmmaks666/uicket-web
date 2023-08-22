@@ -4,7 +4,15 @@ document.addEventListener('DOMContentLoaded', async function () {
     const favoritesCookie = Cookies.get('Favorites');
     const favoritesArray = JSON.parse(favoritesCookie || '[]');
     
+    const loadingMessage = document.createElement('div');
+    loadingMessage.textContent = 'Loading…';
+    // loadingMessage.style.display = 'flex';
+    loadingMessage.style.alignItems = 'center';
+    loadingMessage.style.justifyContent = 'center';
+    loadingMessage.style.height = '100vh';
+    
     for (const releaseId of favoritesArray) {
+		cardContainer.appendChild(loadingMessage);
         const card = document.createElement('div');
         card.classList.add('card');
         
@@ -21,6 +29,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         card.appendChild(button);
         
         cardContainer.appendChild(card);
+        const cards = document.querySelectorAll('.card');
+		cards.forEach(card => {
+			const button = card.querySelector('button');
+			button.style.width = nameLabel.offsetWidth + 'px';
+		});
+		cardContainer.removeChild(loadingMessage);
+
     }
 });
 

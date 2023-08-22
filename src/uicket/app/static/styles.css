@@ -1,13 +1,34 @@
-/* your_styles.css */
+:root {
+  --accent-color: #800080; /* Purple color */
+}
+
+
 .card {
-    border: 1px solid #ccc;
+    border: 3px solid #ccc;
     padding: 10px;
     margin: 10px;
     display: flex;
     flex-direction: column; /* Display children in a column */
-    align-items: left; /* Center children horizontally */
+    align-items: center; /* Center children horizontally */
 }
 
 .card button {
     margin-top: 10px; /* Add spacing between label and button */
+    padding: 20px;
+    width: 90%
+}
+
+body {
+	background-color: #000000;
+	color: #ffffff;
+}
+  
+button {
+	background-color: var(--accent-color);
+    color: #ffffff; /* White text for contrast */
+}
+
+button:hover,
+button:focus {
+	background-color: #a040a0; 
 }

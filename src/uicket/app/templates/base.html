@@ -4,6 +4,7 @@
 		<meta charset="UTF-8">
 		<title>{% block title %}Uicket Web{% endblock %}</title>
 		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 	</head>
 	<body>
 		<header> <a href="/"> <img src="{{ url_for('static', filename='logo.png')}}" alt="Uicket Web" width=150 height=100> </a> </header>

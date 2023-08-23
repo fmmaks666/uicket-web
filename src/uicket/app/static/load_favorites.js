@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 			button.style.width = nameLabel.offsetWidth + 'px';
 		});
 		cardContainer.removeChild(loadingMessage);
-
     }
+    loadingMessage.textContent = '';
+    cardContainer.appendChild(loadingMessage);
 });
 
 async function getReleaseName(releaseId) {

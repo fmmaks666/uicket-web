@@ -244,7 +244,7 @@ def add_favorite(id):
         return generate_response({"error": "Favorites aren't created"}, 404)
     favorites = set(loads(favorites))
     favorites.add(id)
-    response = generate_response({"success": True}, 200)
+    response = generate_response({"success": id in favorites}, 200)
     response.set_cookie("Favorites", dumps(list(favorites)))
     return response
 
@@ -256,7 +256,7 @@ def remove_favorite(id):
         return generate_response({"error": "Favorites aren't created"}, 404)
     favorites = set(loads(favorites))
     favorites.discard(id)
-    response = generate_response({"success": True}, 200)
+    response = generate_response({"success": id not in favorites}, 200)
     response.set_cookie("Favorites", dumps(list(favorites)))
     return response
 

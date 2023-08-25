@@ -169,13 +169,18 @@ def get_episodes(id):
         result = result[0]
         release = HdRezkaApi(result[2])
         translation = request.args.get("translation", type=str)
-        if release.type == "video.movie":
-            streams = release.getStream(translation=translation).videos
-            body = {"type": "streams", "streams": streams}
-        else:
-            seasons = release.getSeasons()
-            body = {"type": release.type, "seasons": seasons}
-        code = 200
+        try:
+            if release.type == "video.movie":
+                streams = release.getStream(translation=translation).videos
+                body = {"type": "streams", "streams": streams}
+                code = 200
+            else:
+                seasons = release.getSeasons()
+                body = {"type": release.type, "seasons": seasons}
+                code = 200
+        except ValueError as e:
+            body = {"error": str(e)}
+            code = 404
     return generate_response(body, code)
 
 

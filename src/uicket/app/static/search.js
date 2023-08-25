@@ -26,7 +26,7 @@ async function displayResults(results, container) {
         const button = document.createElement('button');
         button.textContent = 'Watch!';
         button.addEventListener('click', function () {
-            window.open(`/api/${releaseId}`);
+            window.open(`/release?id=${releaseId}`);
         });
         card.appendChild(button);
         

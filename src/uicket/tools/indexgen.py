@@ -2,9 +2,8 @@ import sqlite3 as sql
 from pathlib import Path
 from os import makedirs
 from shutil import rmtree
-from whoosh.index import create_in, exists_in
+from whoosh.index import create_in
 from whoosh.fields import Schema, TEXT, ID
-from main import UserSettings
 
 table = """CREATE TABLE IF NOT EXISTS releases(id INTEGER PRIMARY KEY, name TEXT, url TEXT)"""
 
@@ -19,8 +18,6 @@ schema = Schema(id=ID(stored=True, unique=True), name=TEXT(stored=True), url=TEX
 path = input("Path to index?: ")
 if not path:
     path = "index"
-config = UserSettings()
-config.update_db(db_path)
 
 def create(data, highest):
     if Path(path).exists():
